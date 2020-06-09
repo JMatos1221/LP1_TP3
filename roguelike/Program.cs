@@ -10,7 +10,7 @@ namespace roguelike
         /// <param name="args">Command lines arguments</param>
         static void Main(string[] args)
         {
-            
+
         }
 
         /// <summary>
@@ -23,6 +23,17 @@ namespace roguelike
             Console.WriteLine("3. Instructions");
             Console.WriteLine("4. Credits");
             Console.WriteLine("5. Quit");
+        }
+
+        /// <summary>
+        /// Prints the Game Credits
+        /// </summary>
+        private void PrintCredits()
+        {
+            Console.WriteLine("Game developed by:");
+            Console.WriteLine("André Figueira");
+            Console.WriteLine("João Matos");
+            Console.WriteLine("Miguel Feliciano");
         }
     }
 }
