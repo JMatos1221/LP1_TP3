@@ -28,14 +28,16 @@ namespace roguelike
                     i += 1;
                 }
             }
-
+            
+            // If arguments were skipped or invalid, show how to use and quit
             if (row <= 0 || col <= 0)
             {
                 Console.WriteLine("Invalid grid size.");
-                Console.WriteLine("Please run  the program with the " +
-                    "arguments -r [rows] -c [columns]");
+                Console.WriteLine("Please run  the program with the arguments -r [rows] -c [columns]");
                 return;
             }
+
+            
         }
 
         /// <summary>
