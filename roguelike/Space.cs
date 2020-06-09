@@ -4,9 +4,9 @@ namespace roguelike
 {
     public class Space
     {
-        State state { get; set; }
+        public State state { get; set; }
 
-        Space(State state)
+        public Space(State state)
         {
             this.state = state;
         }

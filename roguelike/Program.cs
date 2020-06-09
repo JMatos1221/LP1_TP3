@@ -12,8 +12,9 @@ namespace roguelike
         {
             // Declaring variables
             ushort row = 0, col = 0;
+            Board gameBoard;
 
-            // For cycle to read command line aguments
+            // For cycle to read command line arguments
             for (int i = 0; i < args.Length; i++)
             {
                 if (args[i] == "-r")
@@ -37,7 +38,9 @@ namespace roguelike
                 return;
             }
 
-            
+            gameBoard = new Board(row,  col);
+
+            gameBoard.Print();
         }
 
         /// <summary>

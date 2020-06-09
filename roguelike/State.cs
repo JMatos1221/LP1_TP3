@@ -11,6 +11,7 @@ namespace roguelike
         Player,
         Enemy,
         Powerup,
-        Obstacle
+        Obstacle,
+        Exit
     }
 }
