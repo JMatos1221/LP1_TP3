@@ -4,7 +4,7 @@ namespace roguelike
 {
     public class Board
     {
-        int row, col, level, minions, bosses;
+        int row, col, level, minions, bosses, powerups;
         public static int HP { get; set; }
         int[] player = new int[2];
         int playerMoves = 0;
@@ -17,7 +17,8 @@ namespace roguelike
             this.level = level;
             this.minions = this.row * this.col / 36 + level;
             this.bosses = this.level / 3;
-            HP = this.row * this.col / 4;
+            this.powerups = this.row * this.col / 25 - (level / 3);
+            if (level == 1) HP = this.row * this.col / 4;
 
             coordinates = new Space[row, col];
 
@@ -71,6 +72,24 @@ namespace roguelike
                 int ry = new Random().Next(0, this.col);
 
                 if (this.coordinates[rx, ry].State == State.Empty) coordinates[rx, ry].State = State.Boss;
+
+                else i--;
+            }
+
+            for (int i = 0; i < powerups; i++)
+            {
+                int chosenOne = new Random().Next(0, 10);
+
+                if (chosenOne > 7) chosenOne = 6;
+
+                else if (chosenOne > 4) chosenOne = 5;
+
+                else chosenOne = 4;
+
+                int rx = new Random().Next(0, this.row);
+                int ry = new Random().Next(0, this.col);
+
+                if (this.coordinates[rx, ry].State == State.Empty) coordinates[rx, ry].State = (State)chosenOne;
 
                 else i--;
             }
