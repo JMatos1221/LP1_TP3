@@ -12,8 +12,8 @@ namespace roguelike
         static void Main(string[] args)
         {
             // Declaring variables
-            ushort row = 0, col = 0;
-            bool run = true;
+            int row = 0, col = 0, level = 1;
+            bool run = true, win = false;
             Board gameBoard;
             ConsoleKeyInfo userIn;
             string[] highScores = new string[10];
@@ -23,13 +23,13 @@ namespace roguelike
             {
                 if (args[i] == "-r")
                 {
-                    row = Convert.ToUInt16(args[i + 1]);
+                    row = Convert.ToInt32(args[i + 1]);
                     i += 1;
                 }
 
                 else if (args[i] == "-c")
                 {
-                    col = Convert.ToUInt16(args[i + 1]);
+                    col = Convert.ToInt32(args[i + 1]);
                     i += 1;
                 }
             }
@@ -42,7 +42,7 @@ namespace roguelike
                 Environment.Exit(0);
             }
 
-            gameBoard = new Board(row, col, 1);
+            gameBoard = new Board(row, col, level);
 
             /// <summary>
             /// While Cycle for the menu options
@@ -143,7 +143,18 @@ namespace roguelike
                         break;
                 }
 
-                GameCheck(gameBoard);
+                run = gameBoard.GameCheck(gameBoard);
+
+                win = (Board.HP > 0 && run == false);
+
+                if (win)
+                {
+                    level += 1;
+
+                    gameBoard = new Board(row, col, level);
+
+                    run = true;
+                }
             }
         }
 
@@ -187,11 +198,6 @@ namespace roguelike
             Console.WriteLine("You can't move to spaces that contain obstacles or enemies");
             Console.WriteLine("To finish the level you need to reach the exit");
             Console.WriteLine("You can leave the game by pressing Escape\n");
-        }
-
-        private static void GameCheck(Board board)
-        {
-
         }
     }
 }
