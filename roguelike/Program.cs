@@ -12,7 +12,7 @@ namespace roguelike
         static void Main(string[] args)
         {
             // Declaring variables
-            ushort row = 0, col = 0, moves = 0;
+            ushort row = 0, col = 0;
             bool run = true;
             Board gameBoard;
             ConsoleKeyInfo userIn;
@@ -47,6 +47,10 @@ namespace roguelike
             PrintInstructions();
             PrintMenu();
 
+            /// <summary>
+            /// While Cycle for the menu options
+            /// </summary>
+            /// <value>While cycle is true until Quit or New Game is selected</value>
             do
             {
                 userIn = Console.ReadKey(true);
@@ -76,18 +80,64 @@ namespace roguelike
                     case ConsoleKey.D5:
                         Environment.Exit(0);
                         break;
-                    
+
                     case ConsoleKey.Escape:
                         Environment.Exit(0);
                         break;
 
                     default:
-                    Console.WriteLine("Insert a valid option.switch [1][2][3][4][5]");
-                    break;
+                        Console.WriteLine("Insert a valid option.switch [1][2][3][4][5]");
+                        break;
                 }
             } while (userIn.Key != ConsoleKey.D1);
 
             gameBoard.Print();
+
+            while (run)
+            {
+                userIn = Console.ReadKey(true);
+
+                switch (userIn.Key)
+                {
+                    case ConsoleKey.W:
+                        gameBoard.PlayerMove(-1, 0);
+                        break;
+
+                    case ConsoleKey.A:
+                        gameBoard.PlayerMove(0, -1);
+                        break;
+
+                    case ConsoleKey.S:
+                        gameBoard.PlayerMove(1, 0);
+                        break;
+
+                    case ConsoleKey.D:
+                        gameBoard.PlayerMove(0, 1);
+                        break;
+
+                    case ConsoleKey.UpArrow:
+                        gameBoard.PlayerMove(-1, 0);
+                        break;
+
+                    case ConsoleKey.LeftArrow:
+                        gameBoard.PlayerMove(0, -1);
+                        break;
+
+                    case ConsoleKey.DownArrow:
+                        gameBoard.PlayerMove(1, 0);
+                        break;
+
+                    case ConsoleKey.RightArrow:
+                        gameBoard.PlayerMove(0, 1);
+                        break;
+
+                    default:
+                        Console.WriteLine("Invalid control. [W][A][S][D] | [Up][Down][Left][Right]\n");
+                        break;
+                }
+                gameBoard.Print();
+                GameCheck(gameBoard);
+            }
         }
 
         /// <summary>
@@ -130,6 +180,11 @@ namespace roguelike
             Console.WriteLine("You can't move to spaces that contain obstacles or enemies");
             Console.WriteLine("To finish the level you need to reach the exit");
             Console.WriteLine("You can leave the game by pressing Escape\n");
+        }
+
+        private static void GameCheck(Board board)
+        {
+
         }
     }
 }
