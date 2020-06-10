@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 
 namespace roguelike
 {
@@ -11,8 +12,11 @@ namespace roguelike
         static void Main(string[] args)
         {
             // Declaring variables
-            ushort row = 0, col = 0;
+            ushort row = 0, col = 0, moves = 0;
+            bool run = true;
             Board gameBoard;
+            ConsoleKeyInfo userIn;
+            string[] highScores = new string[10];
 
             // For cycle to read command line arguments
             for (int i = 0; i < args.Length; i++)
@@ -29,16 +33,59 @@ namespace roguelike
                     i += 1;
                 }
             }
-            
+
             // If arguments were skipped or invalid, show how to use and quit
             if (row <= 0 || col <= 0)
             {
                 Console.WriteLine("Invalid grid size.");
                 Console.WriteLine("Please run  the program with the arguments -r [rows] -c [columns]");
-                return;
+                Environment.Exit(0);
             }
 
-            gameBoard = new Board(row,  col);
+            gameBoard = new Board(row, col);
+
+            PrintInstructions();
+            PrintMenu();
+
+            do
+            {
+                userIn = Console.ReadKey(true);
+
+                switch (userIn.Key)
+                {
+                    case ConsoleKey.D1:
+                        gameBoard = new Board(row, col);
+                        break;
+
+                    case ConsoleKey.D2:
+                        for (int i = 0; i < highScores.Length; i++)
+                        {
+                            if (highScores[i] == null) break;
+                            Console.WriteLine(highScores[i]);
+                        }
+                        break;
+
+                    case ConsoleKey.D3:
+                        PrintInstructions();
+                        break;
+
+                    case ConsoleKey.D4:
+                        PrintCredits();
+                        break;
+
+                    case ConsoleKey.D5:
+                        Environment.Exit(0);
+                        break;
+                    
+                    case ConsoleKey.Escape:
+                        Environment.Exit(0);
+                        break;
+
+                    default:
+                    Console.WriteLine("Insert a valid option.switch [1][2][3][4][5]");
+                    break;
+                }
+            } while (userIn.Key != ConsoleKey.D1);
 
             gameBoard.Print();
         }
@@ -46,19 +93,19 @@ namespace roguelike
         /// <summary>
         /// Prints the Game Menu
         /// /// </summary>
-        private void PrintMenu()
+        private static void PrintMenu()
         {
             Console.WriteLine("1. New game");
             Console.WriteLine("2. High scores");
             Console.WriteLine("3. Instructions");
             Console.WriteLine("4. Credits");
-            Console.WriteLine("5. Quit");
+            Console.WriteLine("5. Quit\n");
         }
 
         /// <summary>
         /// Prints the Game Credits
         /// </summary>
-        private void PrintCredits()
+        private static void PrintCredits()
         {
             Console.WriteLine("Game developed by:");
             Console.WriteLine("André Figueira");
@@ -69,7 +116,7 @@ namespace roguelike
         /// <summary>
         /// Prints the Game Instructions
         /// </summary>
-        private void PrintInstructions()
+        private static void PrintInstructions()
         {
             Console.WriteLine("Welcome to Roguelike!");
             Console.WriteLine("You can move using the arrow keys or WASD");
@@ -82,7 +129,7 @@ namespace roguelike
             Console.WriteLine("If an enemy is directly up, down, left or right of you, you'll take damage");
             Console.WriteLine("You can't move to spaces that contain obstacles or enemies");
             Console.WriteLine("To finish the level you need to reach the exit");
-            Console.WriteLine("You can leave the game by pressing Escape");
+            Console.WriteLine("You can leave the game by pressing Escape\n");
         }
     }
 }
