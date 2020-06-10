@@ -4,15 +4,19 @@ namespace roguelike
 {
     public class Board
     {
-        int row, col;
+        int row, col, level, minions, bosses, hp;
         int[] player = new int[2];
         ushort playerMoves = 0;
         Space[,] coordinates;
 
-        public Board(int row, int col)
+        public Board(int row, int col, int level)
         {
             this.row = row;
             this.col = col;
+            this.level = level;
+            this.minions = this.row * this.col / 25 + level;
+            this.bosses = this.level / 3;
+            this.hp = this.row * this.col / 4;
 
             coordinates = new Space[row, col];
 
@@ -49,6 +53,26 @@ namespace roguelike
 
                 else i--;
             }
+
+            for (int i = 0; i < minions; i++)
+            {
+                int rx = new Random().Next(0, this.row);
+                int ry = new Random().Next(0, this.col);
+
+                if (this.coordinates[rx, ry].State == State.Empty) coordinates[rx, ry].State = State.Minion;
+
+                else i--;
+            }
+
+            for (int i = 0; i < bosses; i++)
+            {
+                int rx = new Random().Next(0, this.row);
+                int ry = new Random().Next(0, this.col);
+
+                if (this.coordinates[rx, ry].State == State.Empty) coordinates[rx, ry].State = State.Boss;
+
+                else i--;
+            }
         }
 
         public void Print()
@@ -57,15 +81,7 @@ namespace roguelike
             {
                 for (int j = 0; j < this.col; j++)
                 {
-                    if (coordinates[i, j].State == State.Empty) Console.Write("0 ");
-
-                    else if (coordinates[i, j].State == State.Player) Console.Write("1 ");
-
-                    else if (coordinates[i, j].State == State.Enemy) Console.Write("2 ");
-
-                    else if (coordinates[i, j].State == State.Obstacle) Console.Write("X ");
-
-                    else if (coordinates[i, j].State == State.Exit) Console.Write("9");
+                    Console.Write($"{(int)coordinates[i, j].State} ");
                 }
                 Console.WriteLine();
             }
@@ -76,10 +92,14 @@ namespace roguelike
         {
             if (this.player[0] + x >= 0 && this.player[0] + x < this.row
                 && this.player[1] + y >= 0 && this.player[1] + y < this.col &&
-                this.coordinates[this.player[0] + x, this.player[1] + y].State != State.Enemy &&
-                this.coordinates[this.player[0] + x, this.player[1] + y].State != State.Obstacle)
+                this.coordinates[this.player[0] + x, this.player[1] + y].State != State.Minion &&
+                this.coordinates[this.player[0] + x, this.player[1] + y].State != State.Obstacle &&
+                this.coordinates[this.player[0] + x, this.player[1] + y].State != State.Boss)
             {
                 this.coordinates[this.player[0], this.player[1]].State = State.Empty;
+                if (this.coordinates[this.player[0] + x, this.player[1] + y].State == State.PowerupS) hp += 4;
+                if (this.coordinates[this.player[0] + x, this.player[1] + y].State == State.PowerupM) hp += 8;
+                if (this.coordinates[this.player[0] + x, this.player[1] + y].State == State.PowerupL) hp += 16;
                 this.coordinates[this.player[0] + x, this.player[1] + y].State = State.Player;
 
                 this.player[0] += x;
@@ -92,6 +112,10 @@ namespace roguelike
                 EnemyMove();
                 playerMoves = 0;
             }
+
+            if (this.hp > (this.row * this.col / 4)) this.hp = this.row * this.col / 4;
+            
+            Console.Clear();
         }
 
         public void EnemyMove()

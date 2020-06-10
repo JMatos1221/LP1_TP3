@@ -42,10 +42,7 @@ namespace roguelike
                 Environment.Exit(0);
             }
 
-            gameBoard = new Board(row, col);
-
-            PrintInstructions();
-            PrintMenu();
+            gameBoard = new Board(row, col, 1);
 
             /// <summary>
             /// While Cycle for the menu options
@@ -53,28 +50,37 @@ namespace roguelike
             /// <value>While cycle is true until Quit or New Game is selected</value>
             do
             {
+                Console.Clear();
+                PrintMenu();
+
                 userIn = Console.ReadKey(true);
 
                 switch (userIn.Key)
                 {
                     case ConsoleKey.D1:
-                        gameBoard = new Board(row, col);
+                        Console.Clear();
                         break;
 
                     case ConsoleKey.D2:
+                        Console.Clear();
                         for (int i = 0; i < highScores.Length; i++)
                         {
                             if (highScores[i] == null) break;
                             Console.WriteLine(highScores[i]);
                         }
+                        Console.ReadKey(true);
                         break;
 
                     case ConsoleKey.D3:
+                        Console.Clear();
                         PrintInstructions();
+                        Console.ReadKey(true);
                         break;
 
                     case ConsoleKey.D4:
+                        Console.Clear();
                         PrintCredits();
+                        Console.ReadKey(true);
                         break;
 
                     case ConsoleKey.D5:
@@ -91,10 +97,10 @@ namespace roguelike
                 }
             } while (userIn.Key != ConsoleKey.D1);
 
-            gameBoard.Print();
-
             while (run)
             {
+                gameBoard.Print();
+
                 userIn = Console.ReadKey(true);
 
                 switch (userIn.Key)
@@ -132,10 +138,11 @@ namespace roguelike
                         break;
 
                     default:
+                        Console.Clear();
                         Console.WriteLine("Invalid control. [W][A][S][D] | [Up][Down][Left][Right]\n");
                         break;
                 }
-                gameBoard.Print();
+
                 GameCheck(gameBoard);
             }
         }
