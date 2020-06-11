@@ -5,6 +5,7 @@ namespace roguelike
     /// <summary>
     /// Enum defining every board square
     /// </summary>
+    [Flags]
     public enum State
     {
         Empty = 0,
