@@ -5,7 +5,7 @@ namespace roguelike
 {
     public class Board
     {
-        int row, col, minions, bosses, skipPos, powerups, level;
+        int row, col, minions, bosses, skipPos, powerups, counter=0, level;
         public static int HP { get; set; }
         int[] player = new int[2];
         int playerMoves = 0;
@@ -16,9 +16,9 @@ namespace roguelike
             this.row = row;
             this.col = col;
             this.level = level;
-            this.minions = 3;
-            this.bosses = 3;
-            this.powerups = 3;
+            this.minions = row*col / 36 + level;
+            this.bosses = level /3;
+            this.powerups = row * col / 25 - level / 3;
             if (level == 1) HP = row * col / 4;
 
             coordinates = new Space[row, col];
@@ -47,31 +47,35 @@ namespace roguelike
 
             int obstacles = rNum;
 
-            for (int i = 0; i < obstacles;)
+            while (counter < obstacles)
             {
                 int rx = new Random().Next(0, this.row);
                 int ry = new Random().Next(0, this.col);
 
-                if (this.coordinates[rx, ry].State == State.Empty) 
+                if (this.coordinates[rx, ry].State == State.Empty)
                 {
                     coordinates[rx, ry].State = State.Obstacle;
-                    i++;
+                    counter++;
                 }
             }
 
-            for (int i = 0; i < this.minions;)
+            counter = 0;
+
+            while (counter < this.minions)
             {
                 int rx = new Random().Next(0, this.row);
                 int ry = new Random().Next(0, this.col);
 
-                if (this.coordinates[rx, ry].State == State.Empty) 
+                if (this.coordinates[rx, ry].State == State.Empty)
                 {
                     coordinates[rx, ry].State = State.Minion;
-                    i++;
+                    counter++;
                 }
             }
 
-            for (int i = 0; i < this.bosses; i++)
+            counter = 0;
+
+            while (counter < this.bosses)
             {
                 int rx = new Random().Next(0, this.row);
                 int ry = new Random().Next(0, this.col);
@@ -79,19 +83,21 @@ namespace roguelike
                 if (this.coordinates[rx, ry].State == State.Empty) 
                 {
                     coordinates[rx, ry].State = State.Boss;
-                    i++;
+                    counter++;
                 }
             }
 
-            for (int i = 0; i < this.powerups;)
+            counter = 0;
+
+            while (counter < this.powerups)
             {
                 int chosenOne = new Random().Next(0, 10);
 
-                if (chosenOne > 7) chosenOne = 6;
+                if (chosenOne > 7) chosenOne = 32;
 
-                else if (chosenOne > 4) chosenOne = 5;
+                else if (chosenOne > 4) chosenOne = 16;
 
-                else chosenOne = 4;
+                else chosenOne = 8;
 
                 int rx = new Random().Next(0, this.row);
                 int ry = new Random().Next(0, this.col);
@@ -99,23 +105,35 @@ namespace roguelike
                 if (this.coordinates[rx, ry].State == State.Empty) 
                 {
                     coordinates[rx, ry].State = (State)chosenOne;
-                    i++;
+                    counter++;
                 }
             }
         }
 
         public void Print()
         {
-            Console.WriteLine($"HP: {HP}\nLevel: {this.level}\nMinions: {this.minions}\nBosses: {this.bosses}\nPowerups: {this.powerups}\n");
+            Console.WriteLine($"Level: {this.level}    HP: {HP}    Score:\n\nMinions: {this.minions}\nBosses: {this.bosses}\nPowerups: {this.powerups}\n");
             for (int i = 0; i < this.row; i++)
             {
                 for (int j = 0; j < this.col; j++)
                 {
-                    if (coordinates[i, j].State.HasFlag(State.Minion)) Console.Write($"{(int)State.Minion} ");
+                    if (coordinates[i, j].State.HasFlag(State.Player)) Console.Write("1 ");
 
-                    else if (coordinates[i, j].State.HasFlag(State.Boss)) Console.Write($"{(int)State.Boss} ");
+                    else if (coordinates[i, j].State.HasFlag(State.Minion)) Console.Write("2 ");
 
-                    else Console.Write($"{(int)coordinates[i, j].State} ");
+                    else if (coordinates[i, j].State.HasFlag(State.Boss)) Console.Write("3 ");
+
+                    else if (coordinates[i, j].State.HasFlag(State.PowerupS)) Console.Write("4 ");
+
+                    else if (coordinates[i, j].State.HasFlag(State.PowerupM)) Console.Write("5 ");
+
+                    else if (coordinates[i, j].State.HasFlag(State.PowerupL)) Console.Write("6 ");
+
+                    else if (coordinates[i, j].State.HasFlag(State.Obstacle)) Console.Write("8 ");
+
+                    else if (coordinates[i, j].State.HasFlag(State.Exit)) Console.Write("9 ");
+
+                    else if (coordinates[i, j].State.HasFlag(State.Empty)) Console.Write("0 ");
                 }
                 Console.WriteLine();
             }

@@ -11,11 +11,11 @@ namespace roguelike
         Empty = 0,
         Player = 1,
         Minion = 2,
-        Boss = 3,
-        PowerupS = 4,
-        PowerupM = 5,
-        PowerupL = 6,
-        Obstacle = 8,
-        Exit = 9
+        Boss = 4,
+        PowerupS = 8,
+        PowerupM = 16,
+        PowerupL = 32,
+        Obstacle = 64,
+        Exit = 128
     }
 }
