@@ -137,6 +137,10 @@ namespace roguelike
                         gameBoard.PlayerMove(0, 1);
                         break;
 
+                    case ConsoleKey.Escape:
+                        Board.HP = 0;
+                        break;
+
                     default:
                         Console.Clear();
                         Console.WriteLine("Invalid control. [W][A][S][D] | [Up][Down][Left][Right]\n");

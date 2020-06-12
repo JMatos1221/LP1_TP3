@@ -10,6 +10,7 @@ namespace roguelike
         int[] player = new int[2];
         int playerMoves = 0;
         Space[,] coordinates;
+        Random rnd = new Random();
 
         public Board(int row, int col, int level)
         {
@@ -31,26 +32,26 @@ namespace roguelike
                 }
             }
 
-            int rNum = new Random().Next(0, row);
+            int rNum = rnd.Next(0, row);
 
             player[0] = rNum;
             player[1] = 0;
 
             this.coordinates[rNum, 0] = new Space(State.Player);
 
-            rNum = new Random().Next(0, row);
+            rNum = rnd.Next(0, row);
 
             this.coordinates[rNum, col - 1] = new Space(State.Exit);
 
-            if (this.row <= this.col) rNum = new Random().Next(0, this.row);
-            else rNum = new Random().Next(0, this.col);
+            if (this.row <= this.col) rNum = rnd.Next(0, this.row);
+            else rNum = rnd.Next(0, this.col);
 
             int obstacles = rNum;
 
             while (counter < obstacles)
             {
-                int rx = new Random().Next(0, this.row);
-                int ry = new Random().Next(0, this.col);
+                int rx = rnd.Next(0, this.row);
+                int ry = rnd.Next(0, this.col);
 
                 if (this.coordinates[rx, ry].State == State.Empty)
                 {
@@ -63,8 +64,8 @@ namespace roguelike
 
             while (counter < this.minions)
             {
-                int rx = new Random().Next(0, this.row);
-                int ry = new Random().Next(0, this.col);
+                int rx = rnd.Next(0, this.row);
+                int ry = rnd.Next(0, this.col);
 
                 if (this.coordinates[rx, ry].State == State.Empty)
                 {
@@ -77,8 +78,8 @@ namespace roguelike
 
             while (counter < this.bosses)
             {
-                int rx = new Random().Next(0, this.row);
-                int ry = new Random().Next(0, this.col);
+                int rx = rnd.Next(0, this.row);
+                int ry = rnd.Next(0, this.col);
 
                 if (this.coordinates[rx, ry].State == State.Empty)
                 {
@@ -91,7 +92,7 @@ namespace roguelike
 
             while (counter < this.powerups)
             {
-                int chosenOne = new Random().Next(0, 10);
+                int chosenOne = rnd.Next(0, 10);
 
                 if (chosenOne > 7) chosenOne = 32;
 
@@ -99,8 +100,8 @@ namespace roguelike
 
                 else chosenOne = 8;
 
-                int rx = new Random().Next(0, this.row);
-                int ry = new Random().Next(0, this.col);
+                int rx = rnd.Next(0, this.row);
+                int ry = rnd.Next(0, this.col);
 
                 if (this.coordinates[rx, ry].State == State.Empty)
                 {
@@ -145,8 +146,8 @@ namespace roguelike
             if (this.player[0] + x >= 0 && this.player[0] + x < this.row
                 && this.player[1] + y >= 0 && this.player[1] + y < this.col &&
                 this.coordinates[this.player[0] + x, this.player[1] + y].State != State.Minion &&
-                this.coordinates[this.player[0] + x, this.player[1] + y].State != State.Obstacle &&
-                this.coordinates[this.player[0] + x, this.player[1] + y].State != State.Boss)
+                this.coordinates[this.player[0] + x, this.player[1] + y].State != State.Boss &&
+                this.coordinates[this.player[0] + x, this.player[1] + y].State != State.Obstacle)
             {
                 this.coordinates[this.player[0], this.player[1]].State = State.Empty;
                 if (this.coordinates[this.player[0] + x, this.player[1] + y].State == State.PowerupS) HP += 4;
@@ -158,6 +159,8 @@ namespace roguelike
                 this.player[1] += y;
 
                 this.playerMoves += 1;
+
+                Board.HP -= 1;
             }
             if (playerMoves == 2)
             {
@@ -204,7 +207,9 @@ namespace roguelike
                             xDiff = 0;
                         }
 
-                        if (this.coordinates[i + xDiff, j + yDiff].State == State.Empty)
+                        if (this.coordinates[i + xDiff, j + yDiff].State == State.Player) DamagePlayer(i, j);
+
+                        else if (this.coordinates[i + xDiff, j + yDiff].State == State.Empty)
                         {
                             this.coordinates[i + xDiff, j + yDiff].State = enemy;
                             this.coordinates[i, j].State &= ~enemy;
@@ -212,6 +217,8 @@ namespace roguelike
                             if (yDiff == 1) j++;
 
                             if (xDiff == 1) skipPos = j;
+
+                            EnemyTryAttack(i, j);
                         }
 
                         else if (this.coordinates[i + xDiff, j + yDiff].State == State.PowerupS ||
@@ -224,6 +231,8 @@ namespace roguelike
                             if (yDiff == 1) j++;
 
                             if (xDiff == 1) skipPos = j;
+
+                            EnemyTryAttack(i, j);
                         }
 
                         else
@@ -272,7 +281,7 @@ namespace roguelike
 
                             if (possibleMoves.Count > 0)
                             {
-                                int posPick = new Random().Next(0, (possibleMoves.Count / 2));
+                                int posPick = rnd.Next(0, (possibleMoves.Count / 2));
 
                                 posPick *= 2;
 
@@ -300,28 +309,22 @@ namespace roguelike
                     }
                 }
             }
+        }
 
-            for (int i = 0; i < row; i++)
-            {
-                for (int j = 0; j < col; j++)
-                {
-                    if (this.coordinates[i, j].State == State.Minion ||
-                        this.coordinates[i, j].State == State.Boss)
-                    {
-                        if (i < row - 1)
-                            if (coordinates[i + 1, j].State == State.Player) DamagePlayer(i, j);
+        public void EnemyTryAttack(int i, int j)
+        {
 
-                        if (i > 0)
-                            if (coordinates[i - 1, j].State == State.Player) DamagePlayer(i, j);
+            if (i < row - 1)
+                if (coordinates[i + 1, j].State == State.Player) DamagePlayer(i, j);
 
-                        if (j < col - 1)
-                            if (coordinates[i, j + 1].State == State.Player) DamagePlayer(i, j);
+                else if (i > 0)
+                    if (coordinates[i - 1, j].State == State.Player) DamagePlayer(i, j);
 
-                        if (j > 0)
+                    else if (j < col - 1)
+                        if (coordinates[i, j + 1].State == State.Player) DamagePlayer(i, j);
+
+                        else if (j > 0)
                             if (coordinates[i, j - 1].State == State.Player) DamagePlayer(i, j);
-                    }
-                }
-            }
         }
 
         public void DamagePlayer(int row, int col)
