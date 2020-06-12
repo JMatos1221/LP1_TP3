@@ -5,7 +5,7 @@ namespace roguelike
 {
     public class Board
     {
-        int row, col, minions, bosses, skipPos, powerups, counter=0, level;
+        int row, col, minions, bosses, skipPos, powerups, counter = 0, level;
         public static int HP { get; set; }
         int[] player = new int[2];
         int playerMoves = 0;
@@ -16,8 +16,8 @@ namespace roguelike
             this.row = row;
             this.col = col;
             this.level = level;
-            this.minions = row*col / 36 + level;
-            this.bosses = level /3;
+            this.minions = row * col / 36 + level;
+            this.bosses = level / 3;
             this.powerups = row * col / 25 - level / 3;
             if (level == 1) HP = row * col / 4;
 
@@ -80,7 +80,7 @@ namespace roguelike
                 int rx = new Random().Next(0, this.row);
                 int ry = new Random().Next(0, this.col);
 
-                if (this.coordinates[rx, ry].State == State.Empty) 
+                if (this.coordinates[rx, ry].State == State.Empty)
                 {
                     coordinates[rx, ry].State = State.Boss;
                     counter++;
@@ -102,7 +102,7 @@ namespace roguelike
                 int rx = new Random().Next(0, this.row);
                 int ry = new Random().Next(0, this.col);
 
-                if (this.coordinates[rx, ry].State == State.Empty) 
+                if (this.coordinates[rx, ry].State == State.Empty)
                 {
                     coordinates[rx, ry].State = (State)chosenOne;
                     counter++;
@@ -218,7 +218,7 @@ namespace roguelike
                                 this.coordinates[i + xDiff, j + yDiff].State == State.PowerupM ||
                                 this.coordinates[i + xDiff, j + yDiff].State == State.PowerupL)
                         {
-                            this.coordinates[i + xDiff, j].State |= enemy;
+                            this.coordinates[i + xDiff, j + yDiff].State |= enemy;
                             this.coordinates[i, j].State &= ~enemy;
 
                             if (yDiff == 1) j++;
