@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Collections;
 
 namespace roguelike
@@ -11,6 +12,8 @@ namespace roguelike
         /// <param name="args">Command lines arguments</param>
         static void Main(string[] args)
         {
+            // Setting Encoding to UTF8
+            Console.OutputEncoding = Encoding.UTF8;
             // Declaring variables
             int row = 0, col = 0, level = 1;
             bool run = true, win = false;

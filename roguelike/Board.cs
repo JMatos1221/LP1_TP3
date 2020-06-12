@@ -10,6 +10,7 @@ namespace roguelike
         int[] player = new int[2];
         int playerMoves = 0;
         Space[,] coordinates;
+        List<string> actions = new List<string>();
         Random rnd = new Random();
 
         public Board(int row, int col, int level)
@@ -113,7 +114,8 @@ namespace roguelike
 
         public void Print()
         {
-            Console.WriteLine($"Level: {this.level}    HP: {HP}    Score:\n\nMinions: {this.minions}\nBosses: {this.bosses}\nPowerups: {this.powerups}\n");
+            Console.WriteLine($"Level: {this.level}    HP: {HP}    Score:\n\nMinions: {this.minions}\n" +
+                                $"Bosses: {this.bosses}\nPowerups: {this.powerups}\n");
             for (int i = 0; i < this.row; i++)
             {
                 for (int j = 0; j < this.col; j++)
@@ -139,6 +141,17 @@ namespace roguelike
                 Console.WriteLine();
             }
             Console.WriteLine();
+            Console.WriteLine("1. Player\n2. Minion\n3. Boss\n4. Small Powerup\n5. Medium Powerup\n" +
+                                "6. Large Powerup\n8. Obstacle\n9. Exit\n");
+
+            foreach (string i in actions)
+            {
+                Console.WriteLine(i);
+            }
+
+            actions.Clear();
+
+            Console.Write("\nUse [W][A][S][D] | [Up][Down][Left][Right] to move.");
         }
 
         public void PlayerMove(int x, int y)
@@ -150,10 +163,24 @@ namespace roguelike
                 this.coordinates[this.player[0] + x, this.player[1] + y].State != State.Obstacle)
             {
                 this.coordinates[this.player[0], this.player[1]].State = State.Empty;
-                if (this.coordinates[this.player[0] + x, this.player[1] + y].State == State.PowerupS) HP += 4;
-                if (this.coordinates[this.player[0] + x, this.player[1] + y].State == State.PowerupM) HP += 8;
-                if (this.coordinates[this.player[0] + x, this.player[1] + y].State == State.PowerupL) HP += 16;
+                if (this.coordinates[this.player[0] + x, this.player[1] + y].State == State.PowerupS)
+                {
+                    HP += 4;
+                    actions.Add("Player healed for 4.");
+                }
+                if (this.coordinates[this.player[0] + x, this.player[1] + y].State == State.PowerupM)
+                {
+                    HP += 8;
+                    actions.Add("Player healed for 8.");
+                }
+                if (this.coordinates[this.player[0] + x, this.player[1] + y].State == State.PowerupL)
+                {
+                    HP += 16;
+                    actions.Add("Player healed for 16.");
+                }
                 this.coordinates[this.player[0] + x, this.player[1] + y].State = State.Player;
+
+
 
                 this.player[0] += x;
                 this.player[1] += y;
@@ -179,7 +206,8 @@ namespace roguelike
             {
                 for (int j = 0; j < col; j++)
                 {
-                    if (this.coordinates[i, j].State.HasFlag(State.Minion) || this.coordinates[i, j].State.HasFlag(State.Boss))
+                    if (this.coordinates[i, j].State.HasFlag(State.Minion) ||
+                        this.coordinates[i, j].State.HasFlag(State.Boss))
                     {
                         State enemy;
 
@@ -207,12 +235,15 @@ namespace roguelike
                             xDiff = 0;
                         }
 
-                        if (this.coordinates[i + xDiff, j + yDiff].State == State.Player) DamagePlayer(i, j);
+                        if (this.coordinates[i + xDiff, j + yDiff].State == State.Player)
+                            DamagePlayer(i, j);
 
                         else if (this.coordinates[i + xDiff, j + yDiff].State == State.Empty)
                         {
                             this.coordinates[i + xDiff, j + yDiff].State = enemy;
                             this.coordinates[i, j].State &= ~enemy;
+
+                            actions.Add($"Enemy moved from [{i + 1},{j + 1}] to [{i + 1 + xDiff},{j + 1 + yDiff}]");
 
                             if (yDiff == 1) j++;
 
@@ -227,6 +258,9 @@ namespace roguelike
                         {
                             this.coordinates[i + xDiff, j + yDiff].State |= enemy;
                             this.coordinates[i, j].State &= ~enemy;
+
+                            actions.Add($"Enemy moved from [{i + 1},{j + 1}] to [{i + 1 + xDiff},{j + 1 + yDiff}] " +
+                                        "onto a Powerup");
 
                             if (yDiff == 1) j++;
 
@@ -329,9 +363,17 @@ namespace roguelike
 
         public void DamagePlayer(int row, int col)
         {
-            if (coordinates[row, col].State == State.Minion) HP -= 5;
+            if (coordinates[row, col].State == State.Minion)
+            {
+                HP -= 5;
+                actions.Add($"Enemy minion damage player for 5");
+            }
 
-            else if (coordinates[row, col].State == State.Boss) HP -= 10;
+            else if (coordinates[row, col].State == State.Boss)
+            {
+                HP -= 10;
+                actions.Add($"Enemy boss damage player for 10");
+            }
         }
 
         public bool GameCheck(Board board)
@@ -339,7 +381,7 @@ namespace roguelike
             if (Board.HP <= 0)
             {
                 board.Print();
-                Console.WriteLine("You lost the game");
+                Console.WriteLine($"\n\nYou lost the game");
                 return false;
             }
 
