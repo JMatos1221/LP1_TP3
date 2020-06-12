@@ -64,10 +64,12 @@ namespace roguelike
 
                 switch (userIn.Key)
                 {
+                    // Starts a new game
                     case ConsoleKey.D1:
                         Console.Clear();
                         break;
 
+                    // Prints high scores
                     case ConsoleKey.D2:
                         Console.Clear();
 
@@ -81,28 +83,31 @@ namespace roguelike
                         Console.ReadKey(true);
                         break;
 
+                    // Prints the Game Instructions
                     case ConsoleKey.D3:
                         Console.Clear();
                         PrintInstructions();
                         Console.ReadKey(true);
                         break;
 
+                    // Prints the Game Credits
                     case ConsoleKey.D4:
                         Console.Clear();
                         PrintCredits();
                         Console.ReadKey(true);
                         break;
 
+                    // Closes the Game
                     case ConsoleKey.D5:
                         Environment.Exit(0);
                         break;
 
+                    // Closes the Game
                     case ConsoleKey.Escape:
                         Environment.Exit(0);
                         break;
 
                     default:
-                        Console.WriteLine("Insert a valid option.switch [1][2][3][4][5]");
                         break;
                 }
             } while (userIn.Key != ConsoleKey.D1);
@@ -153,10 +158,11 @@ namespace roguelike
 
                     default:
                         Console.Clear();
-                        Console.WriteLine("Invalid control. [W][A][S][D] | [Up][Down][Left][Right]\n");
+                        Console.WriteLine("Invalid control. [W][A][S][D] | [Up][Down][Left][Right] | [Escape] to exit\n");
                         break;
                 }
 
+                // Checking if the level is still going or not
                 run = gameBoard.GameCheck(gameBoard);
 
                 win = (Board.HP > 0 && run == false);
@@ -174,6 +180,7 @@ namespace roguelike
             string nameAux = Board.Name;
             bool added = false;
 
+            // Places the high score in the list or adds it to the end
             for (int i = 0; i < highScores.Count; i += 2)
             {
                 if (Board.Score > Convert.ToInt32(highScores[i + 1]))

@@ -3,7 +3,7 @@ using System;
 namespace roguelike
 {
     /// <summary>
-    /// Enum defining every board square
+    /// Enum defining every board square with Binary Flags to manage Spaces
     /// </summary>
     [Flags]
     public enum State

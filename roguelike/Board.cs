@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace roguelike
 {
+    /// <summary>
+    /// Board Class containing most of the Game Info
+    /// </summary>
     public class Board
     {
         int row, col, minions, bosses, skipPos, powerups, counter = 0, level;
@@ -15,18 +18,27 @@ namespace roguelike
         List<string> actions = new List<string>();
         Random rnd = new Random();
 
+        /// <summary>
+        /// Board constructor
+        /// </summary>
+        /// <param name="row">Number of Rows</param>
+        /// <param name="col">Number of Columns</param>
+        /// <param name="level">Level (Default is 1)</param>
         public Board(int row, int col, int level)
         {
             this.row = row;
             this.col = col;
             this.level = level;
             this.minions = row * col / 36 + level;
+            if (this.minions > row * col / 2) this.minions = row * col / 2;
             this.bosses = level / 3;
             this.powerups = row * col / 25 - level / 3;
+            if (this.powerups < 1) this.powerups = 1;
             if (level == 1) HP = row * col / 4;
 
             coordinates = new Space[row, col];
 
+            // Created Empty Board
             for (int i = 0; i < row; i++)
             {
                 for (int j = 0; j < col; j++)
@@ -40,10 +52,12 @@ namespace roguelike
             player[0] = rNum;
             player[1] = 0;
 
+            // Places Player
             this.coordinates[rNum, 0] = new Space(State.Player);
 
             rNum = rnd.Next(0, row);
 
+            // Places Exit
             this.coordinates[rNum, col - 1] = new Space(State.Exit);
 
             if (this.row <= this.col) rNum = rnd.Next(0, this.row);
@@ -51,6 +65,7 @@ namespace roguelike
 
             int obstacles = rNum;
 
+            // Places Obstacles
             while (counter < obstacles)
             {
                 int rx = rnd.Next(0, this.row);
@@ -65,6 +80,7 @@ namespace roguelike
 
             counter = 0;
 
+            // Places Minions according to levels
             while (counter < this.minions)
             {
                 int rx = rnd.Next(0, this.row);
@@ -79,6 +95,7 @@ namespace roguelike
 
             counter = 0;
 
+            // Places Bosses according to level
             while (counter < this.bosses)
             {
                 int rx = rnd.Next(0, this.row);
@@ -93,6 +110,7 @@ namespace roguelike
 
             counter = 0;
 
+            // Places Powerups according to level
             while (counter < this.powerups)
             {
                 int chosenOne = rnd.Next(0, 10);
@@ -114,9 +132,12 @@ namespace roguelike
             }
         }
 
+        /// <summary>
+        /// Prints the Game Board using Flagged Enum with Binary values
+        /// </summary>
         public void Print()
         {
-            Console.WriteLine($"Level: {this.level}    HP: {HP}    Score:\n\nMinions: {this.minions}\n" +
+            Console.WriteLine($"Level: {this.level}    HP: {HP}\n\nMinions: {this.minions}\n" +
                                 $"Bosses: {this.bosses}\nPowerups: {this.powerups}\n");
             for (int i = 0; i < this.row; i++)
             {
@@ -153,9 +174,14 @@ namespace roguelike
 
             actions.Clear();
 
-            Console.Write("\nUse [W][A][S][D] | [Up][Down][Left][Right] to move.");
+            Console.Write("\nUse [W][A][S][D] | [Up][Down][Left][Right] to move | [Escape] to exit");
         }
 
+        /// <summary>
+        /// Moves the Player if the new Space is Empty or a Powerup
+        /// </summary>
+        /// <param name="x">x distance to move</param>
+        /// <param name="y">y distance to move</param>
         public void PlayerMove(int x, int y)
         {
             if (this.player[0] + x >= 0 && this.player[0] + x < this.row
@@ -202,6 +228,10 @@ namespace roguelike
             Console.Clear();
         }
 
+        /// <summary>
+        /// Moves the Enemy to shorten the it's distance to the Player, if the desired position is blocked
+        /// moves to a random possible position
+        /// </summary>
         public void EnemyMove()
         {
             for (int i = 0; i < row; i++)
@@ -237,9 +267,11 @@ namespace roguelike
                             xDiff = 0;
                         }
 
+                        // If near the player already, doesn't move, damages
                         if (this.coordinates[i + xDiff, j + yDiff].State == State.Player)
                             DamagePlayer(i, j);
 
+                        // Moves if not near the Player to shorten it's distance to him
                         else if (this.coordinates[i + xDiff, j + yDiff].State == State.Empty)
                         {
                             this.coordinates[i + xDiff, j + yDiff].State = enemy;
@@ -254,6 +286,7 @@ namespace roguelike
                             EnemyTryAttack(i, j);
                         }
 
+                        // Moves if not near to the Player as the above, but onto a Powerup
                         else if (this.coordinates[i + xDiff, j + yDiff].State == State.PowerupS ||
                                 this.coordinates[i + xDiff, j + yDiff].State == State.PowerupM ||
                                 this.coordinates[i + xDiff, j + yDiff].State == State.PowerupL)
@@ -271,6 +304,7 @@ namespace roguelike
                             EnemyTryAttack(i, j);
                         }
 
+                        // Moves to random Position
                         else
                         {
                             List<int> possibleMoves = new List<int>();
@@ -347,22 +381,41 @@ namespace roguelike
             }
         }
 
+        /// <summary>
+        /// Checks if the Enemy can attack, attacks if so
+        /// </summary>
+        /// <param name="i"></param>
+        /// <param name="j"></param>
         public void EnemyTryAttack(int i, int j)
         {
 
             if (i < row - 1)
+            {
                 if (coordinates[i + 1, j].State == State.Player) DamagePlayer(i, j);
+            }
 
-                else if (i > 0)
-                    if (coordinates[i - 1, j].State == State.Player) DamagePlayer(i, j);
+            else if (i > 0)
+            {
+                if (coordinates[i - 1, j].State == State.Player) DamagePlayer(i, j);
+            }
 
-                    else if (j < col - 1)
-                        if (coordinates[i, j + 1].State == State.Player) DamagePlayer(i, j);
+            else if (j < col - 1)
+            {
+                if (coordinates[i, j + 1].State == State.Player) DamagePlayer(i, j);
+            }
 
-                        else if (j > 0)
-                            if (coordinates[i, j - 1].State == State.Player) DamagePlayer(i, j);
+            else if (j > 0)
+            {
+                if (coordinates[i, j - 1].State == State.Player) DamagePlayer(i, j);
+            }
+
         }
 
+        /// <summary>
+        /// Damages the Player, depending on the enemy
+        /// </summary>
+        /// <param name="row">Enemy row</param>
+        /// <param name="col">Enemy column</param>
         public void DamagePlayer(int row, int col)
         {
             if (coordinates[row, col].State == State.Minion)
@@ -378,6 +431,11 @@ namespace roguelike
             }
         }
 
+        /// <summary>
+        /// Checks if the game has ended or if the level has been bested
+        /// </summary>
+        /// <param name="board">Game Board</param>
+        /// <returns> True if alive, false if dead or level bested</returns>
         public bool GameCheck(Board board)
         {
             if (Board.HP <= 0)
