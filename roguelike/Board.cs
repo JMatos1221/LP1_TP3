@@ -7,6 +7,8 @@ namespace roguelike
     {
         int row, col, minions, bosses, skipPos, powerups, counter = 0, level;
         public static int HP { get; set; }
+        public static int Score { get; set; }
+        public static string Name { get; set; }
         int[] player = new int[2];
         int playerMoves = 0;
         Space[,] coordinates;
@@ -380,8 +382,14 @@ namespace roguelike
         {
             if (Board.HP <= 0)
             {
+                Score = this.level;
+
                 board.Print();
-                Console.WriteLine($"\n\nYou lost the game");
+                Console.WriteLine($"\n\nYou lost the game with a score of {Score}\n");
+                Console.Write("Insert your name: ");
+                Board.Name = Console.ReadLine();
+
+
                 return false;
             }
 

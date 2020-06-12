@@ -1,6 +1,8 @@
 ﻿using System;
+using System.IO;
 using System.Text;
-using System.Collections;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace roguelike
 {
@@ -19,7 +21,7 @@ namespace roguelike
             bool run = true, win = false;
             Board gameBoard;
             ConsoleKeyInfo userIn;
-            string[] highScores = new string[10];
+            List<string> highScores = new List<string>();
 
             // For cycle to read command line arguments
             for (int i = 0; i < args.Length; i++)
@@ -45,6 +47,8 @@ namespace roguelike
                 Environment.Exit(0);
             }
 
+            if (File.Exists($@"highscores{row}x{col}.txt")) highScores = File.ReadAllLines($@"highscores{row}x{col}.txt").ToList();
+
             gameBoard = new Board(row, col, level);
 
             /// <summary>
@@ -66,10 +70,13 @@ namespace roguelike
 
                     case ConsoleKey.D2:
                         Console.Clear();
-                        for (int i = 0; i < highScores.Length; i++)
+
+                        for (int i = 0; i < highScores.Count; i += 2)
                         {
                             if (highScores[i] == null) break;
-                            Console.WriteLine(highScores[i]);
+                            Console.Write($"{i / 2 + 1}. ");
+                            Console.Write(highScores[i] + " - ");
+                            Console.WriteLine(highScores[i + 1]);
                         }
                         Console.ReadKey(true);
                         break;
@@ -163,6 +170,28 @@ namespace roguelike
                     run = true;
                 }
             }
+
+            string nameAux = Board.Name;
+            bool added = false;
+
+            for (int i = 0; i < highScores.Count; i += 2)
+            {
+                if (Board.Score > Convert.ToInt32(highScores[i + 1]))
+                {
+                    highScores.Insert(i, Board.Score.ToString());
+                    highScores.Insert(i, Board.Name);
+                    added = true;
+                    break;
+                }
+            }
+
+            if (highScores.Count < 20 && !added)
+            {
+                highScores.Add(Board.Name);
+                highScores.Add(Board.Score.ToString());
+            }
+
+            File.WriteAllLines($@"highscores{row}x{col}.txt", highScores);
         }
 
         /// <summary>
